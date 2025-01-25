@@ -54,3 +54,55 @@ function renderQuestions() {
   }
 }
 renderQuestions();
+
+
+
+
+// Your JS code here.
+
+// Load saved progress from session storage
+let userAnswers = JSON.parse(sessionStorage.getItem('progress')) || [];
+
+// Event listener for radio button changes
+document.addEventListener('change', () => {
+  userAnswers = [];
+  const radios = document.querySelectorAll('input[type="radio"]:checked');
+  radios.forEach(radio => {
+    const questionIndex = parseInt(radio.name.replace('question-', ''));
+    userAnswers[questionIndex] = radio.value;
+  });
+  sessionStorage.setItem('progress', JSON.stringify(userAnswers));
+});
+
+// Create submit button and add event listener
+const submitButton = document.createElement('button');
+submitButton.textContent = 'Submit';
+submitButton.addEventListener('click', () => {
+  let score = 0;
+  for (let i = 0; i < questions.length; i++) {
+    if (userAnswers[i] === questions[i].answer) {
+      score++;
+    }
+  }
+
+  const resultElement = document.createElement('p');
+  resultElement.textContent = `Your score is ${score} out of ${questions.length}`;
+  questionsElement.appendChild(resultElement);
+
+  // Store score in local storage
+  localStorage.setItem('score', score);
+
+  // Display stored score
+  const storedScore = localStorage.getItem('score');
+  if (storedScore) {
+    const previousScoreElement = document.createElement('p');
+    previousScoreElement.textContent = `Your previous score: ${storedScore}`;
+    questionsElement.appendChild(previousScoreElement);
+  }
+});
+
+// Add submit button to the page
+questionsElement.appendChild(submitButton);
+
+// Re-render questions to reflect saved progress
+renderQuestions();
